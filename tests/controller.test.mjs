@@ -76,4 +76,3 @@ test("controller preserves a matching committed load when a later explicit revis
   assert.equal(controller.state.committed.revision, "r1");
   assert.equal(controller.state.working.baseRevision, "r1");
 });
-
