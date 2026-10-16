@@ -40,6 +40,12 @@ export class ComposerEntryController {
     return this.#state;
   }
 
+  invalidatePresentation() {
+    this.#epoch += 1;
+    this.#state = null;
+    return Object.freeze({ epoch: this.#epoch });
+  }
+
   beginContext({ accountKey, intent, availability }) {
     this.#epoch += 1;
     const token = Object.freeze({ epoch: this.#epoch });
@@ -80,6 +86,9 @@ export class ComposerEntryController {
     }
     if (expectedState !== this.#state) {
       return Object.freeze({ accepted: false, reason: "stale-state", state: this.#state });
+    }
+    if (!this.#state) {
+      return Object.freeze({ accepted: false, reason: "no-active-context", state: this.#state });
     }
     const mismatchReason = replacementStateMismatchReason(this.#state, nextState);
     if (mismatchReason) {

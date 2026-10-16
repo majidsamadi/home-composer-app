@@ -1,0 +1,33 @@
+{
+  "record_id": "E-P06-CANONICAL-IDENTITY-BRIDGE-01-SOURCE",
+  "producer": {
+    "repository": "majidsamadi/wisestay-user-management-backend",
+    "branch": "feature/account-centre-safe-return-context",
+    "commit": "9ee535d2793ef45a62631fffb8f360e5b30100e0",
+    "tree": "3940711fc15eb5a338c9567da0e2fda27f5e84de"
+  },
+  "vendored": [
+    {
+      "source_path": "clients/web-session/web-session.mjs",
+      "target_path": "vendor/wisestay-web-session/web-session.mjs",
+      "producer_git_blob": "604453c1f75f9651e3b252d89ddc5dcb1f75e970",
+      "target_git_blob": "604453c1f75f9651e3b252d89ddc5dcb1f75e970",
+      "sha256": "a6e8d2c8541401c6f9b0e3eef29b7ec086de843f6d5738cea5475d1cb11dd336",
+      "edited": false
+    },
+    {
+      "source_path": "clients/web-session/web-session.d.mts",
+      "target_path": "vendor/wisestay-web-session/web-session.d.mts",
+      "producer_git_blob": "a92264dcd3fd3da02809db4e213f9c8b998319ac",
+      "target_git_blob": "a92264dcd3fd3da02809db4e213f9c8b998319ac",
+      "sha256": "7b61f926bad524ec0e66fa61a05879de7498b6910ac3abb0dbc18e3f49882cbe",
+      "edited": false
+    }
+  ],
+  "limits": [
+    "Byte-for-byte vendored canonical client; not modified by Home Composer.",
+    "Home Composer is not in the canonical application allowlist and no registration/origin is created here.",
+    "Tests may instantiate an existing registered application only as isolated synthetic protocol setup.",
+    "Authentication does not provide design/resource/action authority."
+  ]
+}

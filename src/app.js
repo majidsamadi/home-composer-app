@@ -1,6 +1,6 @@
+import { ComposerCanonicalIdentityBridge } from "./application/canonicalIdentityBridge.js";
 import { ComposerEntryController } from "./application/composerEntryController.js";
 import {
-  AvailabilityKind,
   applyWorkingPlacementTransform,
   beginSave,
   viewStatus
@@ -15,6 +15,9 @@ import {
 } from "./fixtures/reviewFixtures.js";
 
 const controller = new ComposerEntryController();
+// Deliberately disconnected: Home Composer has no approved canonical app registration/origin.
+// Product composition may inject an approved canonical WebSession later without changing the bridge.
+const identityBridge = new ComposerCanonicalIdentityBridge({ controller, session: null });
 const fixtureButtons = [...document.querySelectorAll("[data-fixture]")];
 const realActions = [...document.querySelectorAll("[data-real-action]")];
 const output = document.getElementById("state-output");
@@ -26,6 +29,17 @@ realActions.forEach(button => { button.disabled = true; });
 
 function render() {
   const state = controller.state;
+  if (!state) {
+    output.textContent = JSON.stringify({
+      canonicalIdentity: "Not connected",
+      accountContext: "Not supplied",
+      resourceAvailability: "Not supplied",
+      committed: null,
+      working: null
+    }, null, 2);
+    notice.textContent = "Canonical identity disconnected · no account/resource authority";
+    return;
+  }
   const intent = describeEntryIntent(state.intent);
   const snapshot = state.committed;
   const status = viewStatus(state);
@@ -46,6 +60,7 @@ function render() {
 }
 
 function startFixture(kind) {
+  // Explicit local synthetic fixture control only; this is not canonical identity composition.
   const intent = kind === "object-intent" ? objectIntentO1V1 : designIntentD1;
   const availability = ({
     "wrong-account": fixtureContexts.wrongAccount,
@@ -99,4 +114,5 @@ document.getElementById("local-save-ack").addEventListener("click", () => {
 });
 
 window.__WISESTAY_REVIEW_FIXTURE__ = Object.freeze({ provenance });
-startFixture("ready-design");
+identityBridge.disconnect("canonical-session-not-configured");
+render();
