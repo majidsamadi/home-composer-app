@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>WiseStay Composer · design-state foundation</title>
+  <style>
+    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1000px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <span class="badge">Synthetic local example · no service/auth/viewer connected</span>
+  <h1>Composer entry and working-design state</h1>
+  <p>This executable local entry demonstrates distinct Object/Design intents, committed-vs-working state, unavailable guards, and save acknowledgement semantics. It defines no public payload or backend route.</p>
+  <div class="grid">
+    <section class="panel">
+      <h2>Local fixtures</h2>
+      <div class="controls">
+        <button data-fixture="ready-design">Design D1 · committed r1</button>
+        <button data-fixture="object-intent">Object O1/v1 intent</button>
+        <button data-fixture="wrong-account">Wrong account</button>
+        <button data-fixture="withdrawn-home">Withdrawn home</button>
+        <button data-fixture="missing-dependency">Missing dependency</button>
+        <button data-fixture="pending-invitation">Pending invitation</button>
+      </div>
+      <h2>Local state operations</h2>
+      <div class="controls">
+        <button id="local-edit">Local fixture: move P1</button>
+        <button id="local-save-fail">Local fixture: unsuccessful save</button>
+        <button id="local-save-ack">Local fixture: inject authoritative save ack</button>
+      </div>
+      <p id="notice" class="note"></p>
+      <h2>Real/domain actions</h2>
+      <div class="controls">
+        <button data-real-action="sign-in">Sign in</button><button data-real-action="open">Open design</button><button data-real-action="create">Create</button><button data-real-action="save">Save to service</button><button data-real-action="share">Share</button><button data-real-action="viewer">Open viewer</button><button data-real-action="property">Select/create property</button>
+      </div>
+      <p class="note">All real actions are disabled. Fixture controls do not authorize a service action.</p>
+    </section>
+    <section class="panel">
+      <h2>Current application state</h2>
+      <pre id="state-output"></pre>
+    </section>
+  </div>
+</main>
+<script type="module" src="./src/app.js"></script>
+</body>
+</html>
