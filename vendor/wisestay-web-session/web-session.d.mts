@@ -36,6 +36,7 @@ export class WebSession {
   readonly enabled: boolean
   readonly authenticated: boolean
   readonly userId: string | null
+  isCurrent(receipt: Receipt | null): boolean
   receipt: Receipt | null
   blocked: boolean
   clear(): void

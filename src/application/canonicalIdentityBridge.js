@@ -82,6 +82,10 @@ export class ComposerCanonicalIdentityBridge {
       this.#controller.invalidatePresentation();
       return result(false, "canonical-session-unavailable");
     }
+    if (typeof session.isCurrent !== "function" || !session.isCurrent(receipt)) {
+      this.#controller.invalidatePresentation();
+      return result(false, "canonical-session-changed");
+    }
 
     // Identity is only mapped to account context. Resource/design availability is
     // independently supplied by the owning adapter; this bridge does not promote it.

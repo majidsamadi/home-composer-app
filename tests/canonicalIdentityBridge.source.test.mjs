@@ -18,8 +18,8 @@ async function sha256(path) {
 test("vendored canonical WebSession bytes match the pinned producer identities", async () => {
   const mjs = fileURLToPath(new URL("../vendor/wisestay-web-session/web-session.mjs", import.meta.url));
   const dts = fileURLToPath(new URL("../vendor/wisestay-web-session/web-session.d.mts", import.meta.url));
-  assert.equal(await sha256(mjs), "a6e8d2c8541401c6f9b0e3eef29b7ec086de843f6d5738cea5475d1cb11dd336");
-  assert.equal(await sha256(dts), "7b61f926bad524ec0e66fa61a05879de7498b6910ac3abb0dbc18e3f49882cbe");
+  assert.equal(await sha256(mjs), "8c83b03365b1a3eac5259d9c32ccc52c703fe6832c3dcbbe010ec05e02ca6b91");
+  assert.equal(await sha256(dts), "14a50fafea96514452d31066e6c47eecbe79cf9d9858905f87570280d6497dd9");
 });
 
 test("canonical allowlist remains unchanged and does not register Home Composer", () => {

@@ -181,6 +181,10 @@ export class WebSession {
   get userId() {
     return this.authenticated ? this.receipt.user_id : null
   }
+  /** Process-local session currentness only; never an application/resource grant. */
+  isCurrent(receipt) {
+    return receipt === this.receipt && this.authenticated
+  }
   clear() {
     this.epoch++
     this.receipt = null
@@ -457,7 +461,10 @@ export function installGuard(
       }
     }
   }
+  let navigation = 0
   router.beforeEach(async (to) => {
+    const own = ++navigation
+    const isLatestNavigation = () => own === navigation
     if (RECOVERY.has(to.path)) {
       reveal()
       return true
@@ -469,6 +476,7 @@ export function installGuard(
     const destination = routeReturnPath(to, { loginPaths, hashRouter })
     try {
       const receipt = await session.restore()
+      if (!isLatestNavigation()) return false
       if (!receipt?.authenticated) {
         if (session.blocked) {
           session.forget()
@@ -481,10 +489,16 @@ export function installGuard(
       // this guard invocation; a later account/error must not inherit it.
       session.forget()
       await admit(receipt)
-      if (!session.authenticated) throw new WebSessionError(401, 'session_changed')
+      // Admission is advisory application work, not a grant. It is useful only
+      // while the exact local session receipt and this navigation remain current.
+      if (!isLatestNavigation()) return false
+      if (!session.isCurrent(receipt)) throw new WebSessionError(401, 'session_changed')
       reveal()
       return loginPaths.includes(to.path) ? (hashRouter ? destination.slice(2) : destination) : true
     } catch (error) {
+      // A newer navigation owns the UI now; an older guard must not redirect,
+      // reveal, forget or otherwise restore its previous private destination.
+      if (!isLatestNavigation()) return false
       if (
         error instanceof WebSessionError &&
         (error.status === 401 ||
