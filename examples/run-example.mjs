@@ -5,8 +5,10 @@ import { committedD1R1, designIntentD1, fixtureContexts } from "../src/fixtures/
 const controller = new ComposerEntryController();
 const context = controller.beginContext({ accountKey: "SYNTHETIC-A", intent: designIntentD1, availability: fixtureContexts.ready });
 controller.acceptCommittedSnapshot(context, committedD1R1);
-controller.replaceState(applyWorkingPlacementTransform(controller.state, "P1", { x: 1.25 }));
-controller.replaceState(beginSave(controller.state, "example-save-1"));
+let expected = controller.state;
+controller.replaceState(context, expected, applyWorkingPlacementTransform(expected, "P1", { x: 1.25 }));
+expected = controller.state;
+controller.replaceState(context, expected, beginSave(expected, "example-save-1"));
 const saveToken = controller.saveToken("example-save-1");
 
 console.log("before acknowledgement:", viewStatus(controller.state).label, "committed", controller.state.committed.revision);

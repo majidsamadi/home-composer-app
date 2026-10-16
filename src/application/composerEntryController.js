@@ -5,6 +5,33 @@ import {
   rejectSave
 } from "../domain/designState.js";
 
+
+function sameRevisionPresence(a, b) {
+  if (!a || !b || a.supplied !== b.supplied) return false;
+  return !a.supplied || a.value === b.value;
+}
+
+function sameIntent(a, b) {
+  return Boolean(a && b)
+    && a.kind === b.kind
+    && a.reference?.id === b.reference?.id
+    && sameRevisionPresence(a.reference?.revision, b.reference?.revision);
+}
+
+function sameAvailability(a, b) {
+  if (!a || !b || a.kind !== b.kind) return false;
+  return sameRevisionPresence(a.reason, b.reason);
+}
+
+function replacementStateMismatchReason(current, next) {
+  if (!next || typeof next !== "object") return "invalid-replacement-state";
+  if (next.contextId !== current.contextId) return "replacement-context-mismatch";
+  if (next.accountKey !== current.accountKey) return "replacement-account-mismatch";
+  if (!sameIntent(next.intent, current.intent)) return "replacement-intent-mismatch";
+  if (!sameAvailability(next.availability, current.availability)) return "replacement-availability-mismatch";
+  return null;
+}
+
 export class ComposerEntryController {
   #epoch = 0;
   #state = null;
@@ -47,9 +74,19 @@ export class ComposerEntryController {
     return Object.freeze({ accepted: true, reason: null, state: this.#state });
   }
 
-  replaceState(state) {
-    this.#state = state;
-    return this.#state;
+  replaceState(token, expectedState, nextState) {
+    if (!token || token.epoch !== this.#epoch) {
+      return Object.freeze({ accepted: false, reason: "stale-context", state: this.#state });
+    }
+    if (expectedState !== this.#state) {
+      return Object.freeze({ accepted: false, reason: "stale-state", state: this.#state });
+    }
+    const mismatchReason = replacementStateMismatchReason(this.#state, nextState);
+    if (mismatchReason) {
+      return Object.freeze({ accepted: false, reason: mismatchReason, state: this.#state });
+    }
+    this.#state = nextState;
+    return Object.freeze({ accepted: true, reason: null, state: this.#state });
   }
 
   saveToken(operationId) {

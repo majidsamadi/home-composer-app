@@ -64,14 +64,16 @@ for (const button of fixtureButtons) {
 
 document.getElementById("local-edit").addEventListener("click", () => {
   if (!controller.state?.committed) return;
-  controller.replaceState(applyWorkingPlacementTransform(controller.state, "P1", { x: 1.25 }));
+  const expected = controller.state;
+  controller.replaceState(currentToken, expected, applyWorkingPlacementTransform(expected, "P1", { x: 1.25 }));
   render();
 });
 
 document.getElementById("local-save-fail").addEventListener("click", () => {
   if (!controller.state?.dirty) return;
   const operationId = `local-save-${++saveSequence}`;
-  controller.replaceState(beginSave(controller.state, operationId));
+  const expected = controller.state;
+  controller.replaceState(currentToken, expected, beginSave(expected, operationId));
   const token = controller.saveToken(operationId);
   controller.acceptSaveFailure(token, "synthetic-not-confirmed");
   render();
@@ -80,7 +82,8 @@ document.getElementById("local-save-fail").addEventListener("click", () => {
 document.getElementById("local-save-ack").addEventListener("click", () => {
   if (!controller.state?.dirty) return;
   const operationId = `local-save-${++saveSequence}`;
-  controller.replaceState(beginSave(controller.state, operationId));
+  const expected = controller.state;
+  controller.replaceState(currentToken, expected, beginSave(expected, operationId));
   const token = controller.saveToken(operationId);
   const authoritative = {
     ...committedD1R1,
