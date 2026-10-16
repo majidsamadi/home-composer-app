@@ -21,6 +21,46 @@ const make = (availability = fixtureContexts.ready) => initializeDesignState({
   committedSnapshot: availability.kind === AvailabilityKind.READY ? committedD1R1 : null
 });
 
+test("direct initialization accepts an exact supplied Design revision", () => {
+  const state = initializeDesignState({
+    contextId: "ctx-exact",
+    accountKey: "SYNTHETIC-A",
+    intent: createDesignIntent({ designId: "D1", designRevision: "r1" }),
+    availability: fixtureContexts.ready,
+    committedSnapshot: committedD1R1
+  });
+  assert.equal(state.intent.reference.revision.supplied, true);
+  assert.equal(state.intent.reference.revision.value, "r1");
+  assert.equal(state.committed.revision, "r1");
+});
+
+test("direct initialization rejects an explicit Design revision mismatch", () => {
+  assert.throws(() => initializeDesignState({
+    contextId: "ctx-revision-mismatch",
+    accountKey: "SYNTHETIC-A",
+    intent: createDesignIntent({ designId: "D1", designRevision: "r1" }),
+    availability: fixtureContexts.ready,
+    committedSnapshot: { ...committedD1R1, revision: "r2" }
+  }), /Design revision/);
+});
+
+test("direct initialization rejects a wrong Design ID", () => {
+  assert.throws(() => initializeDesignState({
+    contextId: "ctx-id-mismatch",
+    accountKey: "SYNTHETIC-A",
+    intent: createDesignIntent({ designId: "D2", designRevision: "r1" }),
+    availability: fixtureContexts.ready,
+    committedSnapshot: committedD1R1
+  }), /Design ID/);
+});
+
+test("revision-not-supplied stays explicit and does not select a revision", () => {
+  const state = make();
+  assert.equal(state.intent.reference.revision.supplied, false);
+  assert.equal("value" in state.intent.reference.revision, false);
+  assert.equal(state.committed.revision, "r1");
+});
+
 test("working update never mutates loaded committed snapshot or source references", () => {
   const state = make();
   const committedBefore = JSON.stringify(state.committed);

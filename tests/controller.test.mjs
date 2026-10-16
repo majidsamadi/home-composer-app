@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { ComposerEntryController } from "../src/application/composerEntryController.js";
+import { createDesignIntent } from "../src/domain/entryIntent.js";
 import { applyWorkingPlacementTransform, beginSave } from "../src/domain/designState.js";
 import { committedD1R1, designIntentD1, fixtureContexts, objectIntentO1V1 } from "../src/fixtures/reviewFixtures.js";
 
@@ -60,3 +61,19 @@ test("Object ID intent does not imply a Composer design destination", () => {
   assert.equal(result.reason, "object-intent-has-no-design-destination");
   assert.equal(controller.state.committed, null);
 });
+test("controller preserves a matching committed load when a later explicit revision mismatches", () => {
+  const controller = new ComposerEntryController();
+  const intent = createDesignIntent({ designId: "D1", designRevision: "r1" });
+  const token = controller.beginContext({ accountKey: "SYNTHETIC-A", intent, availability: fixtureContexts.ready });
+  const matching = controller.acceptCommittedSnapshot(token, committedD1R1);
+  assert.equal(matching.accepted, true);
+  assert.equal(controller.state.committed.revision, "r1");
+
+  const mismatched = controller.acceptCommittedSnapshot(token, { ...committedD1R1, revision: "r2" });
+  assert.equal(mismatched.accepted, false);
+  assert.equal(mismatched.reason, "design-revision-mismatch");
+  assert.equal(controller.state.intent.reference.revision.value, "r1");
+  assert.equal(controller.state.committed.revision, "r1");
+  assert.equal(controller.state.working.baseRevision, "r1");
+});
+

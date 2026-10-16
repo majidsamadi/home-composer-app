@@ -67,6 +67,17 @@ function freezeState(state) {
   });
 }
 
+export function committedSnapshotMismatchReason(intent, committedSnapshot) {
+  assertEntryIntent(intent);
+  if (!committedSnapshot) return null;
+  if (intent.kind !== "design") return "object-intent-has-no-design-destination";
+  if (intent.reference.id !== committedSnapshot.designId) return "design-id-mismatch";
+  if (intent.reference.revision.supplied && intent.reference.revision.value !== committedSnapshot.revision) {
+    return "design-revision-mismatch";
+  }
+  return null;
+}
+
 export function initializeDesignState({
   contextId,
   accountKey,
@@ -76,14 +87,18 @@ export function initializeDesignState({
 }) {
   assertEntryIntent(intent);
   const normalizedAvailability = cloneAvailability(availability);
-  if (committedSnapshot && intent.kind === "design" && intent.reference.id !== committedSnapshot.designId) {
+  const mismatchReason = committedSnapshotMismatchReason(intent, committedSnapshot);
+  if (mismatchReason === "object-intent-has-no-design-destination") {
+    throw new Error("Object ID intent does not identify a Composer design");
+  }
+  if (mismatchReason === "design-id-mismatch") {
     throw new Error("committed design does not match incoming Design ID");
+  }
+  if (mismatchReason === "design-revision-mismatch") {
+    throw new Error("committed design does not match incoming Design revision");
   }
   if (committedSnapshot && normalizedAvailability.kind !== AvailabilityKind.READY) {
     throw new Error("unavailable context cannot initialize cached committed design content");
-  }
-  if (committedSnapshot && intent.kind !== "design") {
-    throw new Error("Object ID intent does not identify a Composer design");
   }
   const committed = committedSnapshot
     ? createCommittedSnapshot(committedSnapshot)

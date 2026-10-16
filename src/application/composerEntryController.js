@@ -1,4 +1,9 @@
-import { initializeDesignState, acknowledgeSave, rejectSave } from "../domain/designState.js";
+import {
+  initializeDesignState,
+  acknowledgeSave,
+  committedSnapshotMismatchReason,
+  rejectSave
+} from "../domain/designState.js";
 
 export class ComposerEntryController {
   #epoch = 0;
@@ -28,8 +33,9 @@ export class ComposerEntryController {
     if (this.#state.availability.kind !== "ready") {
       return Object.freeze({ accepted: false, reason: "availability-blocked", state: this.#state });
     }
-    if (this.#state.intent.kind !== "design") {
-      return Object.freeze({ accepted: false, reason: "object-intent-has-no-design-destination", state: this.#state });
+    const mismatchReason = committedSnapshotMismatchReason(this.#state.intent, committedSnapshot);
+    if (mismatchReason) {
+      return Object.freeze({ accepted: false, reason: mismatchReason, state: this.#state });
     }
     this.#state = initializeDesignState({
       contextId: this.#state.contextId,
