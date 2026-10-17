@@ -6,7 +6,7 @@
   <meta name="referrer" content="no-referrer">
   <title>WiseStay Composer · design-state foundation</title>
   <style>
-    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1000px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
+    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1050px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}.library{margin-top:18px}.library-status{padding:12px;border-radius:10px;background:#eef3f4}.library-list{list-style:none;padding:0;display:grid;gap:12px}.library-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.library-row h3{margin:0 0 6px}.library-row p{margin:5px 0}.fixture-label{font-size:12px;font-weight:600}.review-box{border-left:4px solid #728b91;padding:10px 12px;background:#f7f9fa}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
   </style>
 </head>
 <body>
@@ -15,8 +15,8 @@
   <h1>Composer entry and working-design state</h1>
   <p>This executable local entry demonstrates distinct Object/Design intents, committed-vs-working state, unavailable guards, and save acknowledgement semantics. It defines no public payload or backend route.</p>
   <div class="grid">
-    <section class="panel">
-      <h2>Local fixtures</h2>
+    <section class="panel" aria-labelledby="entry-fixtures-title">
+      <h2 id="entry-fixtures-title">Local entry fixtures</h2>
       <div class="controls">
         <button data-fixture="ready-design">Design D1 · committed r1</button>
         <button data-fixture="object-intent">Object O1/v1 intent</button>
@@ -31,18 +31,34 @@
         <button id="local-save-fail">Local fixture: unsuccessful save</button>
         <button id="local-save-ack">Local fixture: inject authoritative save ack</button>
       </div>
-      <p id="notice" class="note"></p>
+      <p id="notice" class="note" role="status" aria-live="polite"></p>
       <h2>Real/domain actions</h2>
       <div class="controls">
         <button data-real-action="sign-in">Sign in</button><button data-real-action="open">Open design</button><button data-real-action="create">Create</button><button data-real-action="save">Save to service</button><button data-real-action="share">Share</button><button data-real-action="viewer">Open viewer</button><button data-real-action="property">Select/create property</button>
       </div>
       <p class="note">All real actions are disabled. Fixture controls do not authorize a service action.</p>
     </section>
-    <section class="panel">
-      <h2>Current application state</h2>
-      <pre id="state-output"></pre>
+    <section class="panel" aria-labelledby="state-title">
+      <h2 id="state-title">Current application state</h2>
+      <pre id="state-output" aria-live="polite"></pre>
     </section>
   </div>
+
+  <section class="panel library" aria-labelledby="library-title">
+    <span class="badge">Local synthetic design-library fixtures · not an actual user library</span>
+    <h2 id="library-title">Design library review surface</h2>
+    <p>Rows preserve supplied arrangement status, exact Design revision and source status. A Design ID/revision is never displayed as a grant, and review selection does not open or edit a design.</p>
+    <div class="controls" aria-label="Local synthetic design-library outcomes">
+      <button data-library-fixture="ready">Ready rows</button>
+      <button data-library-fixture="empty">Empty</button>
+      <button data-library-fixture="restricted">Restricted</button>
+      <button data-library-fixture="missing-dependency">Missing dependency</button>
+      <button data-library-fixture="unavailable">Unavailable</button>
+    </div>
+    <p id="library-status" class="library-status" role="status" aria-live="polite"></p>
+    <ul id="library-list" class="library-list" aria-label="Design library rows"></ul>
+    <div id="library-review" class="review-box" role="status" aria-live="polite">No row selected.</div>
+  </section>
 </main>
 <script type="module" src="./src/app.js"></script>
 </body>
