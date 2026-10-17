@@ -6,7 +6,7 @@
   <meta name="referrer" content="no-referrer">
   <title>WiseStay Composer · design-state foundation</title>
   <style>
-    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1050px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}.library{margin-top:18px}.library-status{padding:12px;border-radius:10px;background:#eef3f4}.library-list{list-style:none;padding:0;display:grid;gap:12px}.library-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.library-row h3{margin:0 0 6px}.library-row p{margin:5px 0}.fixture-label{font-size:12px;font-weight:600}.review-box{border-left:4px solid #728b91;padding:10px 12px;background:#f7f9fa}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
+    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1050px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}.library{margin-top:18px}.library-status{padding:12px;border-radius:10px;background:#eef3f4}.library-list{list-style:none;padding:0;display:grid;gap:12px}.library-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.library-row h3{margin:0 0 6px}.library-row p{margin:5px 0}.fixture-label{font-size:12px;font-weight:600}.review-box{border-left:4px solid #728b91;padding:10px 12px;background:#f7f9fa}.scene{margin-top:18px}.scene-status{padding:12px;border-radius:10px;background:#eef3f4}.scene-list{list-style:none;padding:0;display:grid;gap:12px}.scene-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.scene-row[data-environment="illustrative-sandbox"]{border-style:dashed;background:#fffaf0}.scene-row h3{margin:0 0 6px}.scene-row p{margin:5px 0}.scene-kind{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
   </style>
 </head>
 <body>
@@ -58,6 +58,23 @@
     <p id="library-status" class="library-status" role="status" aria-live="polite"></p>
     <ul id="library-list" class="library-list" aria-label="Design library rows"></ul>
     <div id="library-review" class="review-box" role="status" aria-live="polite">No row selected.</div>
+  </section>
+
+  <section class="panel scene" aria-labelledby="scene-title">
+    <span class="badge">Local synthetic home/scene fixtures · not an actual property or authorization</span>
+    <h2 id="scene-title">Home &amp; scene-version selection review</h2>
+    <p>Supplied property, scene and version references remain exact. Source status, current-action status, scale and coverage limitations are shown separately. Selecting a row is review-only and never replaces the Composer home or creates edit/save rights.</p>
+    <div class="controls" aria-label="Local synthetic home and scene outcomes">
+      <button data-scene-fixture="journey">Scene journey</button>
+      <button data-scene-fixture="empty">Empty</button>
+      <button data-scene-fixture="restricted">Restricted</button>
+      <button data-scene-fixture="missing-dependency">Missing dependency</button>
+      <button data-scene-fixture="unavailable">Unavailable</button>
+      <button id="scene-account-change">Switch synthetic account (clear)</button>
+    </div>
+    <p id="scene-status" class="scene-status" role="status" aria-live="polite"></p>
+    <ul id="scene-list" class="scene-list" aria-label="Home and scene version rows"></ul>
+    <div id="scene-review" class="review-box" role="status" aria-live="polite">No scene selected.</div>
   </section>
 </main>
 <script type="module" src="./src/app.js"></script>

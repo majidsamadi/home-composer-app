@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",
-    "example": "node examples/run-example.mjs"
+    "example": "node examples/run-example.mjs",
+    "scene-example": "node examples/run-scene-selection.mjs"
   }
 }
