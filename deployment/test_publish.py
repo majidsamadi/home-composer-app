@@ -84,9 +84,13 @@ class PublishTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def fetch(self, url):
+    def fetch(self, url, headers=None):
         self.assertTrue(url.startswith(SITE["origin"]), url)
-        return self.live[url[len(SITE["origin"]):]]
+        path = url[len(SITE["origin"]):]
+        # The live BFF serves readiness only with the web-session contract header.
+        if path == SITE["readiness_path"] and (headers or {}).get("X-WiseStay-Web-Session") != "wisestay.web-session.v1":
+            return 403, "application/json", b'{"error":"forbidden"}'
+        return self.live[path]
 
     def run_publish(self, activation=None):
         ctx = p.Context(site=dict(SITE), activation=activation or dict(ACTIVATION), env=self.env, runner=self.fake,
