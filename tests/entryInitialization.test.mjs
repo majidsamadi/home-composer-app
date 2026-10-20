@@ -8,6 +8,8 @@ import {
   describeEntryInitialization
 } from "../src/application/entryInitializationPresentation.js";
 import { entryInitializationFixtures } from "../src/fixtures/entryInitializationFixtures.js";
+import { ENTRY_INIT_ACTIONS, entryInitActionsReason, mountEntryInitialization } from "../src/presentation/entryInitView.js";
+import { describedBy, parseHtml } from "./helpers/domStub.mjs";
 
 const load = relative => readFile(fileURLToPath(new URL(relative, import.meta.url)), "utf8");
 const byId = id => entryInitializationFixtures.find(item => item.id === id);
@@ -153,6 +155,33 @@ test("entry-initialization review source exposes a labelled status region and di
   assert.match(html, /id="entry-init-facts"[^>]*aria-label="Entry initialization facts"/);
   assert.match(html, /Prototype \/ synthetic \/ not connected/);
   const source = await load("../src/app.js");
-  assert.match(source, /describeEntryInitialization\(/);
+  assert.match(source, /mountEntryInitialization\(document\)/);
   assert.doesNotMatch(source, /new WebSession\s*\(/);
+  const view = await load("../src/presentation/entryInitView.js");
+  assert.match(view, /describeEntryInitialization\(/);
+});
+
+// C-R2: the disabled actions are visible buttons, disabled, with a linked reason.
+test("C-R2 visible Open/Edit/Save buttons are disabled with an aria-describedby reason", async () => {
+  const doc = parseHtml(await load("../index.html"));
+  const group = doc.getElementById("entry-init-actions");
+  const reason = doc.getElementById("entry-init-actions-reason");
+  const buttons = group.querySelectorAll("button[data-entry-init-action]");
+  assert.deepEqual(buttons.map(button => button.textContent), ENTRY_INIT_ACTIONS.map(item => item.label));
+  for (const button of buttons) {
+    assert.equal(button.disabled, true, `${button.textContent} disabled in static markup`);
+    assert.equal(button.getAttribute("aria-describedby"), "entry-init-actions-reason");
+  }
+  assert.match(reason.textContent, /^Open, Edit and Save are disabled/);
+
+  const mounted = mountEntryInitialization(doc);
+  for (const fixture of entryInitializationFixtures) {
+    const description = mounted.render(fixture.id);
+    assert.equal(description.actionsDisabled, true, fixture.id);
+    for (const button of buttons) {
+      assert.equal(button.disabled, true, `${fixture.id} ${button.textContent}`);
+      assert.equal(describedBy(button), entryInitActionsReason(description), `${fixture.id} ${button.textContent}`);
+    }
+    assert.ok(reason.textContent.endsWith(`Current state: ${description.headline}.`), fixture.id);
+  }
 });

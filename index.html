@@ -6,7 +6,7 @@
   <meta name="referrer" content="no-referrer">
   <title>WiseStay Composer · design-state foundation</title>
   <style>
-    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1050px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}.library{margin-top:18px}.library-status{padding:12px;border-radius:10px;background:#eef3f4}.library-list{list-style:none;padding:0;display:grid;gap:12px}.library-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.library-row h3{margin:0 0 6px}.library-row p{margin:5px 0}.fixture-label{font-size:12px;font-weight:600}.review-box{border-left:4px solid #728b91;padding:10px 12px;background:#f7f9fa}.scene{margin-top:18px}.scene-status{padding:12px;border-radius:10px;background:#eef3f4}.scene-list{list-style:none;padding:0;display:grid;gap:12px}.scene-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.scene-row[data-environment="illustrative-sandbox"]{border-style:dashed;background:#fffaf0}.scene-row h3{margin:0 0 6px}.scene-row p{margin:5px 0}.scene-kind{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.entry-init{margin-top:18px}.entry-init-status{padding:12px;border-radius:10px;background:#eef3f4;font-weight:600}.entry-init-facts{display:grid;grid-template-columns:minmax(160px,1fr) 2fr;gap:6px 14px}.entry-init-facts dt{font-weight:600}.entry-init-facts dd{margin:0}.entry-init-facts dd small{display:block;color:#52616b}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
+    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1050px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}.library{margin-top:18px}.library-status{padding:12px;border-radius:10px;background:#eef3f4}.library-list{list-style:none;padding:0;display:grid;gap:12px}.library-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.library-row h3{margin:0 0 6px}.library-row p{margin:5px 0}.fixture-label{font-size:12px;font-weight:600}.review-box{border-left:4px solid #728b91;padding:10px 12px;background:#f7f9fa}.scene{margin-top:18px}.scene-status{padding:12px;border-radius:10px;background:#eef3f4}.scene-list{list-style:none;padding:0;display:grid;gap:12px}.scene-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.scene-row[data-environment="illustrative-sandbox"]{border-style:dashed;background:#fffaf0}.scene-row h3{margin:0 0 6px}.scene-row p{margin:5px 0}.scene-kind{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.entry-init{margin-top:18px}.entry-init-status{padding:12px;border-radius:10px;background:#eef3f4;font-weight:600}.entry-init-facts{display:grid;grid-template-columns:minmax(160px,1fr) 2fr;gap:6px 14px}.entry-init-facts dt{font-weight:600}.entry-init-facts dd{margin:0}.entry-init-facts dd small{display:block;color:#52616b}.workspace{margin-top:18px}.workspace-status{padding:12px;border-radius:10px;background:#eef3f4;font-weight:600}.renderer-label{font-weight:700}.field-error{color:#9b1c1c;font-size:13px;margin:2px 0 8px}.placement-surface{border:2px dashed #728b91;border-radius:10px;padding:8px;margin:8px 0}.placement-surface:focus,button:focus,input:focus,select:focus,textarea:focus{outline:3px solid #1d4ed8;outline-offset:2px}.placement-list{list-style:none;padding:0;display:grid;gap:6px}.placement-list li{display:flex;flex-wrap:wrap;gap:6px;align-items:center}button[aria-pressed="true"]{background:#dbeafe}label{display:block;font-size:13px;margin-top:6px}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
   </style>
 </head>
 <body>
@@ -84,6 +84,86 @@
     <p id="entry-init-status" class="entry-init-status" role="status" aria-live="polite"></p>
     <p id="entry-init-text" class="note"></p>
     <dl id="entry-init-facts" class="entry-init-facts" aria-label="Entry initialization facts"></dl>
+    <div class="controls" id="entry-init-actions" role="group" aria-label="Design actions (disabled in this review)">
+      <button type="button" data-entry-init-action="open" disabled aria-describedby="entry-init-actions-reason">Open</button>
+      <button type="button" data-entry-init-action="edit" disabled aria-describedby="entry-init-actions-reason">Edit</button>
+      <button type="button" data-entry-init-action="save" disabled aria-describedby="entry-init-actions-reason">Save</button>
+    </div>
+    <p id="entry-init-actions-reason" class="note">Open, Edit and Save are disabled: this is a read-only synthetic review with no account, design or save authority connected.</p>
+  </section>
+
+  <section class="panel workspace" aria-labelledby="workspace-title">
+    <span class="badge">Prototype / synthetic / not connected · fake Composer service and text-only fake viewer</span>
+    <h2 id="workspace-title">Workspace (synthetic review)</h2>
+    <p>Edits run against an in-memory fake of the Composer service and a viewer that draws nothing and describes the scene as text. No account, home or object is real, and nothing leaves this page. Fit results use provisional thresholds.</p>
+    <div class="controls" role="group" aria-label="Synthetic workspace setup">
+      <label for="workspace-account">Synthetic account</label>
+      <select id="workspace-account">
+        <option value="USER-A">USER-A · owner</option>
+        <option value="USER-D">USER-D · editor</option>
+        <option value="USER-B">USER-B · commenter</option>
+        <option value="USER-C">USER-C · viewer</option>
+        <option value="USER-E">USER-E · no access</option>
+      </select>
+      <label for="workspace-renderer">Synthetic renderer</label>
+      <select id="workspace-renderer">
+        <option value="webgl2-compatibility">Compatibility (WebGL2)</option>
+        <option value="webgpu">WebGPU</option>
+        <option value="unsupported">Unsupported</option>
+      </select>
+      <button type="button" id="workspace-open">Open synthetic design</button>
+      <button type="button" id="workspace-open-empty">Open empty synthetic design</button>
+      <button type="button" id="workspace-offline" aria-pressed="false">Simulate offline</button>
+      <button type="button" id="workspace-concurrent">Simulate another editor's save</button>
+      <button type="button" id="workspace-device-lost">Simulate 3D device loss</button>
+      <button type="button" id="workspace-check">Check for newer revision</button>
+      <button type="button" id="workspace-close">Close workspace</button>
+    </div>
+    <p id="workspace-status" class="workspace-status" role="status" aria-live="polite">No design open.</p>
+    <p id="workspace-announcement" class="note" role="status" aria-live="polite"></p>
+    <div class="grid">
+      <div>
+        <h3>3D view</h3>
+        <p id="workspace-renderer-label" class="renderer-label">No viewer connected.</p>
+        <p id="workspace-geometry" class="note"></p>
+        <p id="workspace-viewer-text" class="note"></p>
+        <div class="controls" role="group" aria-label="Camera">
+          <button type="button" data-camera="orbit-left">Orbit left</button>
+          <button type="button" data-camera="orbit-right">Orbit right</button>
+          <button type="button" data-camera="zoom-in">Zoom in</button>
+          <button type="button" data-camera="zoom-out">Zoom out</button>
+          <button type="button" data-camera="top" aria-pressed="false">Top view</button>
+          <button type="button" data-camera="focus-home">Focus home</button>
+          <button type="button" id="workspace-reload-view" hidden>Reload view</button>
+        </div>
+        <div id="workspace-placements"></div>
+      </div>
+      <div>
+        <div class="controls" role="group" aria-label="Save">
+          <p id="workspace-working" class="note"></p>
+          <button type="button" id="workspace-save">Save</button>
+          <button type="button" id="workspace-undo">Undo last unsaved change</button>
+          <button type="button" id="workspace-reapply" hidden>Keep my edits on the newer revision</button>
+          <button type="button" id="workspace-discard" hidden>Discard my edits</button>
+          <button type="button" id="workspace-load-latest" hidden>Load latest revision</button>
+        </div>
+        <section aria-labelledby="object-entry-title">
+          <h3 id="object-entry-title">Add an object by Object ID</h3>
+          <label for="object-entry-id">Object ID</label>
+          <input id="object-entry-id" type="text" autocomplete="off" spellcheck="false" aria-describedby="object-entry-id-error">
+          <p id="object-entry-id-error" class="field-error"></p>
+          <label for="object-entry-version">Exact version</label>
+          <input id="object-entry-version" type="text" inputmode="numeric" value="1" aria-describedby="object-entry-version-error">
+          <p id="object-entry-version-error" class="field-error"></p>
+          <button type="button" id="object-entry-lookup">Look up object</button>
+          <div id="object-entry-preview" role="status" aria-live="polite"></div>
+        </section>
+        <div id="workspace-controls"></div>
+        <div id="workspace-fit"></div>
+      </div>
+    </div>
+    <div id="workspace-alternatives"></div>
+    <div id="workspace-share"></div>
   </section>
 </main>
 <script type="module" src="./src/app.js"></script>
