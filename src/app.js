@@ -7,6 +7,8 @@ import {
 import { rowSelectionReason } from "./domain/designLibraryState.js";
 import { sceneSelectionReason } from "./domain/homeSceneSelectionState.js";
 import { describeEntryIntent } from "./domain/entryIntent.js";
+import { describeEntryInitialization } from "./application/entryInitializationPresentation.js";
+import { entryInitializationFixtures } from "./fixtures/entryInitializationFixtures.js";
 import { createLocalDesignLibraryAdapter } from "./fixtures/designLibraryFixtures.js";
 import { createLocalHomeSceneAdapter } from "./fixtures/homeSceneFixtures.js";
 import {
@@ -221,6 +223,42 @@ function renderScenes() {
   }
 }
 
+const entryInitControls = document.getElementById("entry-init-controls");
+const entryInitStatus = document.getElementById("entry-init-status");
+const entryInitText = document.getElementById("entry-init-text");
+const entryInitFacts = document.getElementById("entry-init-facts");
+function renderEntryInitialization(fixtureId) {
+  // Read-only E entry-initialization review; never touches the Composer controller.
+  const fixture = entryInitializationFixtures.find(item => item.id === fixtureId);
+  const description = describeEntryInitialization(fixture ? fixture.input : { intent: null });
+  entryInitStatus.textContent = `${fixture ? fixture.label : "No state selected"} · ${description.status} — ${description.headline}`;
+  entryInitText.textContent = description.textAlternative;
+  const sectionPrefix = { entry: "", committed: "Committed — ", unsaved: "Unsaved example — " };
+  entryInitFacts.replaceChildren();
+  for (const item of description.rows) {
+    const term = document.createElement("dt");
+    term.textContent = `${sectionPrefix[item.section]}${item.label}`;
+    const value = document.createElement("dd");
+    value.textContent = item.value;
+    value.dataset.supplied = String(item.supplied);
+    const source = document.createElement("small");
+    source.textContent = `Source: ${item.source}`;
+    value.append(source);
+    entryInitFacts.append(term, value);
+  }
+  for (const button of entryInitControls.querySelectorAll("button")) {
+    button.setAttribute("aria-pressed", String(button.dataset.entryInitFixture === fixtureId));
+  }
+}
+for (const fixture of entryInitializationFixtures) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.entryInitFixture = fixture.id;
+  button.textContent = fixture.label;
+  button.setAttribute("aria-pressed", "false");
+  button.addEventListener("click", () => renderEntryInitialization(fixture.id));
+  entryInitControls.append(button);
+}
 function startFixture(kind) {
   // Explicit local synthetic fixture control only; this is not canonical identity composition.
   const intent = kind === "object-intent" ? objectIntentO1V1 : designIntentD1;
@@ -315,3 +353,4 @@ sceneController.invalidateContext("scene-adapter-not-connected");
 render();
 renderLibrary();
 renderScenes();
+renderEntryInitialization(null);

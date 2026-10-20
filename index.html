@@ -6,7 +6,7 @@
   <meta name="referrer" content="no-referrer">
   <title>WiseStay Composer · design-state foundation</title>
   <style>
-    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1050px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}.library{margin-top:18px}.library-status{padding:12px;border-radius:10px;background:#eef3f4}.library-list{list-style:none;padding:0;display:grid;gap:12px}.library-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.library-row h3{margin:0 0 6px}.library-row p{margin:5px 0}.fixture-label{font-size:12px;font-weight:600}.review-box{border-left:4px solid #728b91;padding:10px 12px;background:#f7f9fa}.scene{margin-top:18px}.scene-status{padding:12px;border-radius:10px;background:#eef3f4}.scene-list{list-style:none;padding:0;display:grid;gap:12px}.scene-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.scene-row[data-environment="illustrative-sandbox"]{border-style:dashed;background:#fffaf0}.scene-row h3{margin:0 0 6px}.scene-row p{margin:5px 0}.scene-kind{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
+    :root{font-family:system-ui,sans-serif;color:#17202a;background:#f5f7f8}body{margin:0}.shell{max-width:1050px;margin:auto;padding:32px}.badge{display:inline-block;padding:5px 10px;border:1px solid #8aa;border-radius:999px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8e0e2;border-radius:14px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:8px}button{padding:9px 12px;border-radius:9px;border:1px solid #9aa;background:#fff}button:disabled{opacity:.45}pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;border-radius:12px;padding:18px;min-height:420px}.note{font-size:13px;color:#52616b}.library{margin-top:18px}.library-status{padding:12px;border-radius:10px;background:#eef3f4}.library-list{list-style:none;padding:0;display:grid;gap:12px}.library-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.library-row h3{margin:0 0 6px}.library-row p{margin:5px 0}.fixture-label{font-size:12px;font-weight:600}.review-box{border-left:4px solid #728b91;padding:10px 12px;background:#f7f9fa}.scene{margin-top:18px}.scene-status{padding:12px;border-radius:10px;background:#eef3f4}.scene-list{list-style:none;padding:0;display:grid;gap:12px}.scene-row{border:1px solid #d8e0e2;border-radius:12px;padding:14px}.scene-row[data-environment="illustrative-sandbox"]{border-style:dashed;background:#fffaf0}.scene-row h3{margin:0 0 6px}.scene-row p{margin:5px 0}.scene-kind{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.entry-init{margin-top:18px}.entry-init-status{padding:12px;border-radius:10px;background:#eef3f4;font-weight:600}.entry-init-facts{display:grid;grid-template-columns:minmax(160px,1fr) 2fr;gap:6px 14px}.entry-init-facts dt{font-weight:600}.entry-init-facts dd{margin:0}.entry-init-facts dd small{display:block;color:#52616b}@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:18px}}
   </style>
 </head>
 <body>
@@ -75,6 +75,15 @@
     <p id="scene-status" class="scene-status" role="status" aria-live="polite"></p>
     <ul id="scene-list" class="scene-list" aria-label="Home and scene version rows"></ul>
     <div id="scene-review" class="review-box" role="status" aria-live="polite">No scene selected.</div>
+  </section>
+  <section class="panel entry-init" aria-labelledby="entry-init-title">
+    <span class="badge">Prototype / synthetic / not connected · WS-E-P06-ENTRY-INITIALIZATION-010 v0.1</span>
+    <h2 id="entry-init-title">Entry &amp; design initialization review</h2>
+    <p>Read-only review of authored entry states. Supplied facts and facts that are <strong>Not supplied</strong> are both shown as text. Nothing is opened, edited, saved or authorized, and all real actions stay disabled.</p>
+    <div class="controls" id="entry-init-controls" aria-label="Local synthetic entry-initialization states"></div>
+    <p id="entry-init-status" class="entry-init-status" role="status" aria-live="polite"></p>
+    <p id="entry-init-text" class="note"></p>
+    <dl id="entry-init-facts" class="entry-init-facts" aria-label="Entry initialization facts"></dl>
   </section>
 </main>
 <script type="module" src="./src/app.js"></script>
