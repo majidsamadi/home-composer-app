@@ -40,3 +40,19 @@ Source: WBS §6 "Decisions to make later" (Q01–Q16). This file records the pro
 
 - IDM-01 (Account Centre registration of Composer) is OPEN. It blocks live sign-in and return together with Q15.
 - The vendored web-session pin sits on the unmerged upstream branch `feature/account-centre-safe-return-context`, and upstream `main` differs. Whether to re-pin is OPEN; the bytes are unchanged.
+
+## Wave 3 (2026-10-20)
+
+- **Q15-R1 (plan refinement, recorded by the integration loop).** The Composer site hosting (bucket, distribution, publisher role, publication parameter) lives in the owner-applied `wisestay-infrastructure` root `applications/three-d-dev`, not in `applications/websites`. The bucket name, the origin `https://composer.wizestay.com` and the session route shape are unchanged. No Cognito client is created for Composer.
+- **Pipeline status:** dev publication pipeline configured and locally verified (fakes, local build); dev deployment pending publish.
+- **Sign-in:** the page reaches the API only through the `user.wizestay.com` web-session BFF. The vendored web-session client (IDM `5b08595`) registers `composer`, so live mode is reachable only on `https://composer.wizestay.com`.
+- **Q14 expectation:** Resvanta property facts stay unavailable in dev, so placing objects into a home is expected to report BLOCKED (Q14).
+- **Test identities:** signed-in journeys need two owner-created synthetic accounts and the integration secrets described in the Home Scanner backend. Without them those journeys report BLOCKED.
+
+### Wave 3 integration (`int`, 2026-10-20)
+- Web-session registration: User Management `clients/web-session/web-session.mjs` lists `composer` at `https://composer.wizestay.com`, allowed to call only the `composer` API (IDM commit `5b08595`, branch `feature/3d-wave3`). This repository vendors those bytes byte-for-byte, so live mode is reachable only on that origin once the site is published.
+- Dev integration suite: `three-dimension-view-arcore-backend` `.github/workflows/dev-integration.yml` (manual dispatch on `main`; `contents: read`, no OIDC token, no AWS credentials). Its report records each journey as `passed`, `failed` or `blocked` with the exact reason. Only a `passed` journey may later be called `paired-integrated (dev)`.
+- Expected first run (with identities): `composer` (sandbox design, object placed by Object ID, Design ID versus Object ID sharing) is feasible; `composer_home_placement` is BLOCKED while `home_scanner` is blocked (Q14).
+- Test identities (needs a human): two synthetic accounts created at `https://user.wizestay.com` with confirmed e-mail and TOTP, stored as the six `WS3D_IT_*` repository secrets of `three-dimension-view-arcore-backend`. No User Management mechanism creates them automatically (MFA required, no CI `AdminCreateUser`). Until they exist, the suite reports `BLOCKED_TEST_IDENTITIES_ABSENT` with the missing secret names. Steps: `three-dimension-view-arcore-backend` `docs/DEV_INTEGRATION.md`.
+- Cross-repo consistency check (role names/ARNs, OIDC subjects and repository ids, state keys, domains, API URLs, tags, activation and approval ids, IDM registration and vendored client bytes): 293 of 293 checks match; no change was needed.
+- Status: dev deploy pipeline configured; not dev-deployed (no deploy receipt or smoke result exists yet). Synthetic data only (Q07).

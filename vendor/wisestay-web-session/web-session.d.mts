@@ -16,10 +16,6 @@ export class WebSessionError extends Error {
   constructor(status: number, code: string, uncertain?: boolean)
 }
 export function safeReturnPath(value: unknown, fallback?: string): string
-export function routeReturnPath(
-  to: { path?: unknown; fullPath?: unknown; query?: unknown },
-  options?: { loginPaths?: string[]; hashRouter?: boolean },
-): string
 export function authorizationUrl(value: unknown): string
 export class WebSession {
   constructor(options: {
@@ -36,7 +32,6 @@ export class WebSession {
   readonly enabled: boolean
   readonly authenticated: boolean
   readonly userId: string | null
-  isCurrent(receipt: Receipt | null): boolean
   receipt: Receipt | null
   blocked: boolean
   clear(): void

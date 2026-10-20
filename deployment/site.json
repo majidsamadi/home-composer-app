@@ -1,0 +1,16 @@
+{
+  "contract": "wisestay.3d.site-config.v1",
+  "repository": "majidsamadi/home-composer-app",
+  "site": "composer",
+  "origin": "https://composer.wizestay.com",
+  "bucket": "wisestay-web-composer-511831442607",
+  "publication_parameter": "/wisestay/dev/websites/composer/publication",
+  "publisher_role_arn": "arn:aws:iam::511831442607:role/wisestay-web-composer-publisher",
+  "assumed_role_prefix": "arn:aws:sts::511831442607:assumed-role/wisestay-web-composer-publisher/",
+  "account": "511831442607",
+  "region": "ap-southeast-1",
+  "environment": "dev",
+  "readiness_path": "/api/v1/web-session/composer/readiness",
+  "build_command": "node scripts/build-site.mjs",
+  "output": "dist"
+}

@@ -13,6 +13,10 @@ export const APPLICATIONS = Object.freeze({
   resvanta: 'https://resvanta.wizestay.com',
   'main-mobile': 'https://main-mobile.dev.wizestay.com',
   'iot-mobile': 'https://mobile.dev.wizestay.com',
+  'home-scanner': 'https://home-scanner.wizestay.com',
+  'object-scanner': 'https://object-scanner.wizestay.com',
+  composer: 'https://composer.wizestay.com',
+  finder: 'https://finder.wizestay.com',
 })
 const SERVICES = {
   owner: ['core'],
@@ -24,6 +28,10 @@ const SERVICES = {
   resvanta: ['resvanta'],
   'main-mobile': ['core', 'iot'],
   'iot-mobile': ['core', 'iot'],
+  'home-scanner': ['home-scanner'],
+  'object-scanner': ['object-scanner'],
+  composer: ['composer'],
+  finder: ['finder'],
 }
 const RECOVERY = new Set(['/auth/error', '/signed-out'])
 const object = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -88,22 +96,6 @@ export function safeReturnPath(value, fallback = '/') {
     return fallback
   }
 }
-/** Derive an application-owned local destination from router state only.
- * Display labels, route names, params and caller metadata are never redirect authority.
- */
-export function routeReturnPath(
-  to,
-  { loginPaths = ['/login', '/sign-in'], hashRouter = false } = {},
-) {
-  if (!object(to) || typeof to.path !== 'string') return '/'
-  const fullPath = typeof to.fullPath === 'string' ? to.fullPath : to.path
-  if (loginPaths.includes(to.path)) {
-    const query = object(to.query) ? to.query : {}
-    return safeReturnPath(query.returnTo)
-  }
-  return safeReturnPath(hashRouter ? '/#' + fullPath : fullPath)
-}
-
 export function authorizationUrl(value) {
   if (typeof value !== 'string') return invalid()
   const url = new URL(value)
@@ -180,10 +172,6 @@ export class WebSession {
   }
   get userId() {
     return this.authenticated ? this.receipt.user_id : null
-  }
-  /** Process-local session currentness only; never an application/resource grant. */
-  isCurrent(receipt) {
-    return receipt === this.receipt && this.authenticated
   }
   clear() {
     this.epoch++
@@ -311,9 +299,6 @@ export class WebSession {
       value.authenticated &&
       this.receipt.user_id !== value.user_id
     ) {
-      // A return path captured under the previous canonical person must never
-      // survive an identity transition into a later account.
-      this.forget()
       this.clear()
       throw new WebSessionError(401, 'identity_changed')
     }
@@ -453,59 +438,37 @@ export function installGuard(
     session.notifySignedOut = () => channel.postMessage('signed-out')
     channel.onmessage = (event) => {
       if (event.data === 'signed-out') {
-        hide()
-        session.forget()
         session.clear()
         session.blocked = true
         session.navigate('/signed-out')
       }
     }
   }
-  let navigation = 0
   router.beforeEach(async (to) => {
-    const own = ++navigation
-    const isLatestNavigation = () => own === navigation
     if (RECOVERY.has(to.path)) {
       reveal()
       return true
     }
-    // Protected content stays hidden until both current identity and app-owned
-    // admission have succeeded. Redirect/error URLs never carry private intent.
-    hide()
     if (to.path.startsWith('/auth/')) return { path: '/auth/error' }
-    const destination = routeReturnPath(to, { loginPaths, hashRouter })
+    const raw = hashRouter ? '/#' + to.fullPath : to.fullPath
+    const destination = loginPaths.includes(to.path)
+      ? safeReturnPath(to.query.returnTo)
+      : safeReturnPath(raw)
     try {
       const receipt = await session.restore()
-      if (!isLatestNavigation()) return false
       if (!receipt?.authenticated) {
-        if (session.blocked) {
-          session.forget()
-          return { path: '/signed-out' }
-        }
+        if (session.blocked) return { path: '/signed-out', query: { returnTo: destination } }
+        hide()
         await session.start(destination)
         return false
       }
-      // The login handoff is complete. Keep the intended destination only in
-      // this guard invocation; a later account/error must not inherit it.
-      session.forget()
       await admit(receipt)
-      // Admission is advisory application work, not a grant. It is useful only
-      // while the exact local session receipt and this navigation remain current.
-      if (!isLatestNavigation()) return false
-      if (!session.isCurrent(receipt)) throw new WebSessionError(401, 'session_changed')
-      reveal()
+      if (!session.authenticated) throw new WebSessionError(401, 'session_changed')
+      session.forget()
       return loginPaths.includes(to.path) ? (hashRouter ? destination.slice(2) : destination) : true
-    } catch (error) {
-      // A newer navigation owns the UI now; an older guard must not redirect,
-      // reveal, forget or otherwise restore its previous private destination.
-      if (!isLatestNavigation()) return false
-      if (
-        error instanceof WebSessionError &&
-        (error.status === 401 ||
-          ['identity_changed', 'session_changed', 'web_login_cancelled'].includes(error.code))
-      )
-        session.forget()
-      return { path: '/auth/error' }
+    } catch {
+      reveal()
+      return { path: '/auth/error', query: { returnTo: destination } }
     }
   })
 }

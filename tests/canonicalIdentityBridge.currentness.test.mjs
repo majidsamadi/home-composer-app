@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { ComposerCanonicalIdentityBridge } from "../src/application/canonicalIdentityBridge.js";
+import { ComposerCanonicalIdentityBridge, isCurrentReceipt } from "../src/application/canonicalIdentityBridge.js";
 import { ComposerEntryController } from "../src/application/composerEntryController.js";
 import { createDesignIntent } from "../src/domain/entryIntent.js";
 import { fixtureContexts } from "../src/fixtures/reviewFixtures.js";
@@ -11,7 +11,7 @@ test("exact current canonical receipt is accepted with separately supplied avail
   const f = canonicalFixture();
   const receipt = await f.session.restore();
   assert.equal(receipt.user_id, USER_A);
-  assert.equal(f.session.isCurrent(receipt), true);
+  assert.equal(isCurrentReceipt(f.session, receipt), true);
 
   const controller = new ComposerEntryController();
   const bridge = new ComposerCanonicalIdentityBridge({ controller, session: f.session });
@@ -28,14 +28,14 @@ test("exact current canonical receipt is accepted with separately supplied avail
 test("stale same-user receipt is rejected after actual canonical clear and reestablishment", async () => {
   const f = canonicalFixture();
   const firstReceipt = await f.session.restore(true);
-  assert.equal(f.session.isCurrent(firstReceipt), true);
+  assert.equal(isCurrentReceipt(f.session, firstReceipt), true);
 
   f.session.clear();
   const secondReceipt = await f.session.restore(true);
   assert.equal(secondReceipt.user_id, firstReceipt.user_id);
   assert.notEqual(secondReceipt, firstReceipt);
-  assert.equal(f.session.isCurrent(firstReceipt), false);
-  assert.equal(f.session.isCurrent(secondReceipt), true);
+  assert.equal(isCurrentReceipt(f.session, firstReceipt), false);
+  assert.equal(isCurrentReceipt(f.session, secondReceipt), true);
 
   // Simulate delivery of the already-captured old receipt after a same-user
   // reestablishment. Currentness is still decided by the real canonical session.
@@ -51,7 +51,7 @@ test("stale same-user receipt is rejected after actual canonical clear and reest
   assert.equal(result.reason, "canonical-session-changed");
   assert.equal(controller.state, null);
   assert.equal(f.session.userId, USER_A);
-  assert.equal(f.session.isCurrent(secondReceipt), true);
+  assert.equal(isCurrentReceipt(f.session, secondReceipt), true);
 
   f.session.restore = liveRestore;
 });

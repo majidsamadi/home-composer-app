@@ -17,7 +17,7 @@ const manifestText = readFileSync(new URL(`../${MANIFEST_PATH}`, import.meta.url
 test("SOURCE.json pins the upstream web-session client to an exact commit", () => {
   const manifest = parseSourceManifest(manifestText);
   assert.equal(manifest.repository, "majidsamadi/wisestay-user-management-backend");
-  assert.equal(manifest.commit, "553ac3c08973114f26271d1a751437d9203b5cd4");
+  assert.equal(manifest.commit, "5b085956d3435145fe80922a53d4d304aa19f97f");
   assert.deepEqual(manifest.files.map(item => item.sourcePath), [
     "clients/web-session/web-session.mjs",
     "clients/web-session/web-session.d.mts"
@@ -28,8 +28,8 @@ test("local vendored bytes match the manifest sha256, git blob and size", () => 
   const manifest = parseSourceManifest(manifestText);
   assert.deepEqual(checkLocalAgainstManifest(repoRoot, manifest), []);
   const mjs = readFileSync(new URL("../vendor/wisestay-web-session/web-session.mjs", import.meta.url));
-  assert.equal(sha256Hex(mjs), "8c83b03365b1a3eac5259d9c32ccc52c703fe6832c3dcbbe010ec05e02ca6b91");
-  assert.equal(gitBlobSha(mjs), "625a036934bc3c9b2ad788c9811e1ec8be42b76f");
+  assert.equal(sha256Hex(mjs), "153b77584d8d10606ba183c64bb780770a0e256a85a6546343f6b08a2c975bac");
+  assert.equal(gitBlobSha(mjs), "dba86fcc8b447a5b7b786af8b1645d11fb7e3bb6");
 });
 
 test("a manifest hash that differs from the local bytes is reported", () => {

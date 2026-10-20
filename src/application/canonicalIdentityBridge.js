@@ -10,6 +10,13 @@ function restoreFailureReason(error) {
   return "canonical-session-unavailable";
 }
 
+// Process-local receipt currentness: the exact receipt object the canonical session
+// holds now, while it is authenticated. Not a resource/action grant. The canonical
+// client at the wave 3 pin has no isCurrent(), so the bridge keeps the check here.
+export function isCurrentReceipt(session, receipt) {
+  return receipt != null && session.receipt === receipt && session.authenticated === true;
+}
+
 export class ComposerCanonicalIdentityBridge {
   #controller;
   #session;
@@ -82,7 +89,7 @@ export class ComposerCanonicalIdentityBridge {
       this.#controller.invalidatePresentation();
       return result(false, "canonical-session-unavailable");
     }
-    if (typeof session.isCurrent !== "function" || !session.isCurrent(receipt)) {
+    if (!isCurrentReceipt(session, receipt)) {
       this.#controller.invalidatePresentation();
       return result(false, "canonical-session-changed");
     }
