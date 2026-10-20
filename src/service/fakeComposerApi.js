@@ -33,9 +33,9 @@ export function computeFit({ placement, home, question = null, clearanceMarginM 
   const result = (outcome, reasons, combined = null, margin = null) => ({
     outcome, reasons, thresholds_version: THRESHOLDS_VERSION, combined_uncertainty_m: combined, margin_m: margin
   });
-  if (placement.scale_mode === "illustrative") return result("unknown", ["illustrative_scale"]);
+  if (placement.scale_mode === "illustrative") return result("unknown", ["illustrative_scale_mode"]);
   if (placement.scale_claim === "unknown" || home.scale_claim === "unknown") return result("unknown", ["scale_claim_unknown"]);
-  if (!Array.isArray(placement.dimensions_m)) return result("unknown", ["dimensions_not_recorded"]);
+  if (!Array.isArray(placement.dimensions_m)) return result("unknown", ["dimensions_unknown"]);
   const uObj = Math.max(0.01, 0.03 * Math.max(...placement.dimensions_m));
   const extent = Math.max(...home.bounds_m.max.map((value, axis) => value - home.bounds_m.min[axis]));
   const uRoom = Math.max(0.05, 0.02 * extent);
@@ -51,7 +51,7 @@ export function computeFit({ placement, home, question = null, clearanceMarginM 
   if (VERIFIED_CLAIMS.has(placement.scale_claim) && VERIFIED_CLAIMS.has(home.scale_claim) && combined < margin) {
     return result("verified_fit", [], combined, margin);
   }
-  return result("unverified_fit", ["uncertainty_not_below_margin"], combined, margin);
+  return result("unverified_fit", ["margin_within_uncertainty"], combined, margin);
 }
 
 // Minimum distance from the rotated footprint's bounding box to the home bounds (x/z).

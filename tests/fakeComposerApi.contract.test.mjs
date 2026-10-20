@@ -123,7 +123,7 @@ test("HCA X.4 fit rules: verified, unverified, approximate and unknown outcomes"
   assert.equal(approximate.outcome, "approximate");
   assert.deepEqual(approximate.reasons, ["scale_claim_approximate"]);
   const illustrative = computeFit({ placement: { ...p1, scale_mode: "illustrative", illustrative_scale: 2 }, home, question: "clearance", clearanceMarginM: 0.3 });
-  assert.deepEqual([illustrative.outcome, illustrative.reasons, illustrative.combined_uncertainty_m], ["unknown", ["illustrative_scale"], null]);
+  assert.deepEqual([illustrative.outcome, illustrative.reasons, illustrative.combined_uncertainty_m], ["unknown", ["illustrative_scale_mode"], null]);
   assert.equal(computeFit({ placement: { ...p1, scale_claim: "unknown" }, home }).outcome, "unknown");
   assert.equal(computeFit({ placement: p1, home: { ...home, scale_claim: "estimated" }, question: "clearance", clearanceMarginM: 0.3 }).outcome, "approximate");
 

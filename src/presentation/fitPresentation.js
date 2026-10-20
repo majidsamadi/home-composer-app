@@ -8,13 +8,13 @@ export const FIT_LABELS = Object.freeze({
 });
 
 export const FIT_REASON_TEXT = Object.freeze({
-  illustrative_scale: "The object is shown at illustrative scale, not real size.",
+  illustrative_scale_mode: "The object is shown at illustrative scale, not real size.",
   scale_claim_unknown: "The object's or home's scale is unknown.",
-  dimensions_not_recorded: "The object has no recorded dimensions.",
+  dimensions_unknown: "The object has no recorded dimensions.",
   scale_claim_approximate: "Sizes are estimated or seller-declared, so the result is approximate.",
   clearance_not_requested: "No clearance margin was requested.",
   footprint_outside_home_bounds: "The footprint extends past the home bounds.",
-  uncertainty_not_below_margin: "Measurement uncertainty is not smaller than the margin.",
+  margin_within_uncertainty: "Measurement uncertainty is not smaller than the margin.",
   opening_clearance_not_supported: "Door swing and openings are not checked."
 });
 
