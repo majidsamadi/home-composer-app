@@ -1,18 +1,22 @@
 name: Verify Composer application
-
 on:
   pull_request:
   push:
     branches:
       - main
-
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Publish the verified current main commit to dev hosting (no-push retry)
+        type: boolean
+        required: true
+        default: false
 permissions:
   contents: read
-
 concurrency:
   group: hca-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+  # Never cancel a main run: it may be publishing the dev site.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   application:
     name: Node application checks
@@ -26,9 +30,75 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
       - name: Check B-RFX v0.3 draft contract fixtures
         run: node scripts/check-contract-fixtures.mjs
       - name: Check v0.4 draft contract fixtures
         run: node scripts/check-contract-fixtures-v0_4.mjs
       - name: Run node --test suite
         run: npm test
+      - name: Build the static site
+        run: node scripts/build-site.mjs
+      - name: Install hash-pinned test-only parser
+        run: python -m pip install --require-hashes --only-binary=":all:" --no-deps -r requirements-test.txt
+      - name: Publication and workflow unit tests
+        run: python -m unittest discover -s deployment -p 'test_*.py' -v
+  deploy:
+    name: Guarded dev publication (account 511831442607)
+    needs: [application]
+    if: github.repository == 'majidsamadi/home-composer-app' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy == true))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: wisestay-web-composer-publication
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Build the static site for this commit
+        run: node scripts/build-site.mjs
+      - name: Reject superseded main before AWS credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')" = "$GITHUB_SHA"
+      - name: Assume only the Composer site publisher role
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708
+        with:
+          role-to-assume: arn:aws:iam::511831442607:role/wisestay-web-composer-publisher
+          aws-region: ap-southeast-1
+          allowed-account-ids: '511831442607'
+          role-session-name: composer-publish-${{ github.run_id }}
+          role-duration-seconds: 3600
+          unset-current-credentials: true
+      - name: Verify caller identity before publication
+        run: |
+          set -euo pipefail
+          identity="$(aws sts get-caller-identity --output json)"
+          python3 - "$identity" <<'PY'
+          import json, sys
+          identity = json.loads(sys.argv[1])
+          assert identity["Account"] == "511831442607", "wrong AWS account"
+          assert identity["Arn"].startswith("arn:aws:sts::511831442607:assumed-role/wisestay-web-composer-publisher/"), "wrong role"
+          print("caller verified: 511831442607 wisestay-web-composer-publisher")
+          PY
+      - name: Publish, invalidate and verify the live site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 deployment/publish.py
+      - name: Upload the deployment receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: deployment-receipt-${{ github.sha }}
+          path: dist/deployment-receipt.json
+          if-no-files-found: error
+          retention-days: 30
