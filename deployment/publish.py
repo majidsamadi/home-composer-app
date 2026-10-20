@@ -31,6 +31,9 @@ ACCOUNT = "511831442607"
 APPROVAL_REFERENCE = "owner-3d-dev-deployment-2026-10-20"
 ACTIVATION_CONTRACT = "wisestay.3d.activation.v1"
 RECEIPT_CONTRACT = "wisestay.3d.deployment-receipt.v1"
+# The IDM web-session BFF answers readiness only for requests carrying this contract header.
+WEB_SESSION_CONTRACT = "wisestay.web-session.v1"
+READINESS_HEADERS = {"Accept": "application/json", "X-WiseStay-Web-Session": WEB_SESSION_CONTRACT}
 SCRIPT_TYPE = "text/javascript; charset=utf-8"
 LIVE_ATTEMPTS = 12
 LIVE_INTERVAL_S = 10
@@ -38,8 +41,8 @@ DENIED_SERVICES = ("s3", "cloudfront", "ssm", "sts", "kms")
 _DENIED = re.compile(r"not authorized to perform:?\s+((?:%s):[A-Z][A-Za-z]+)" % "|".join(DENIED_SERVICES))
 
 Runner = Callable[[list, int], "subprocess.CompletedProcess[str]"]
-# fetch(url) -> (status | None, content type, body bytes)
-Fetch = Callable[[str], "tuple[int | None, str, bytes]"]
+# fetch(url, headers=None) -> (status | None, content type, body bytes)
+Fetch = Callable[..., "tuple[int | None, str, bytes]"]
 
 
 class Stop(Exception):
@@ -66,8 +69,8 @@ def default_runner(args: list, timeout: int) -> "subprocess.CompletedProcess[str
                           env={**os.environ, "AWS_PAGER": ""})
 
 
-def default_fetch(url: str) -> "tuple[int | None, str, bytes]":
-    request = urllib.request.Request(url, method="GET", headers={"Cache-Control": "no-cache"})
+def default_fetch(url: str, headers: dict | None = None) -> "tuple[int | None, str, bytes]":
+    request = urllib.request.Request(url, method="GET", headers={"Cache-Control": "no-cache", **(headers or {})})
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             return response.status, response.headers.get("Content-Type", ""), response.read(2_000_000)
@@ -243,7 +246,7 @@ def verify_live(ctx: Context, release: dict, receipt: dict) -> None:
             smoke["result"] = "failed"
             raise Stop("failed", "LIVE_REVISION_MISMATCH", "smoke")
         ctx.sleep(LIVE_INTERVAL_S)
-    status, content_type, body = ctx.fetch(origin + ctx.site["readiness_path"])
+    status, content_type, body = ctx.fetch(origin + ctx.site["readiness_path"], headers=READINESS_HEADERS)
     readiness = {"status": status, "content_type": content_type.split(";")[0].strip(), "result": "failed"}
     receipt["readiness"] = readiness
     try:
