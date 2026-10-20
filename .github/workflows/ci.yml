@@ -28,5 +28,7 @@ jobs:
           node-version: '22'
       - name: Check B-RFX v0.3 draft contract fixtures
         run: node scripts/check-contract-fixtures.mjs
+      - name: Check v0.4 draft contract fixtures
+        run: node scripts/check-contract-fixtures-v0_4.mjs
       - name: Run node --test suite
         run: npm test
