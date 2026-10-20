@@ -33,6 +33,9 @@ import {
   loadSupersededFixture
 } from "./helpers/contractFixtures.mjs";
 import { canonicalFixture, USER_A, USER_B } from "./helpers/canonicalWebSessionFixture.mjs";
+import { createHarness } from "./helpers/workspaceHarness.mjs";
+import { GeometryState } from "../src/application/workspaceController.js";
+import { SYNTHETIC } from "../src/fixtures/workspaceFixtures.js";
 
 const at = label => {
   const [id, version] = label.split("@");
@@ -265,8 +268,10 @@ test("draft: B-RFX-05 observation-match examples", { skip: "no HCA observation-m
 
 // ---------------------------------------------------------------- B-RFX-06
 
-test("draft: B-RFX-06 'wrong resource' is denied without leaking the requested resource", () => {
-  // homeSceneSelectionState.selectSceneRow only selects a supplied row.
+test("draft: B-RFX-06 row absence only: unlisted row cannot be selected (not grant-scope refusal)", () => {
+  // C-R1: this is a row lookup. homeSceneSelectionState.selectSceneRow only selects a
+  // supplied row; it does not evaluate grant scope. Grant-scope refusal is covered by
+  // tests/fakeComposerApi.contract.test.mjs (role matrix, 404 non-disclosure) and HCB-06.
   const example = fixtureExample("B-RFX-06", "wrong resource");
   const granted = at(example.grant_scope.split(" ")[0]);
   const requested = at(example.requested.split(" ")[0]);
@@ -287,7 +292,6 @@ test("draft: B-RFX-06 'wrong resource' is denied without leaking the requested r
   const result = selectSceneRow(state, `${requested.id}@${requested.version}`);
   assert.equal(result.accepted, false);
   assert.equal(result.reason, "scene-row-not-found");
-  assert.doesNotMatch(result.reason, new RegExp(requested.id));
   assert.equal(result.state.selection, null);
 });
 
@@ -316,7 +320,23 @@ test("draft: B-RFX-07 second account never inherits the first account's design",
   assert.equal(controller.acceptCommittedSnapshot(first.token, snapshot).reason, "stale-context");
 });
 
-test("draft: B-RFX-07 'device loss while opening exact asset'", { skip: "no HCA renderer consumer in this slice" }, () => {});
+test("draft: B-RFX-07 'device loss while opening exact asset' exposes loss without alternate access or backend switch", async () => {
+  // WorkspaceController (HCA-02.4) is now the renderer consumer. Mapped to its
+  // fake-viewer device-lost path; "exact asset" is the pinned home scene version.
+  const example = fixtureExample("B-RFX-07", "device loss while opening exact asset");
+  assert.equal(example.new_gpu_context, null);
+  const h = createHarness({ renderer: "webgpu" });
+  await h.controller.open({ designId: SYNTHETIC.designId });
+  const sessionsBefore = h.fake.calls.filter(call => call.operation === "createViewSession").length;
+  h.viewer.emit("device-lost", { reason: "synthetic", recoverable: true });
+  const view = h.controller.view();
+  assert.equal(view.geometry.state, GeometryState.DEVICE_LOST, "renderer loss is exposed");
+  assert.match(view.geometry.text, /^3D view lost — Reload view/);
+  assert.equal(h.viewers.length, 1, "no silent backend switch: no other viewer is created");
+  assert.equal(view.renderer.label, "WebGPU view");
+  assert.equal(h.fake.calls.filter(call => call.operation === "createViewSession").length, sessionsBefore, "no alternate access is requested");
+  assert.equal(h.viewer.calls.filter(call => call.method === "load").length, 1, "nothing is reopened until the user chooses Reload view");
+});
 
 // ---------------------------------------------------------------- B-RFX-08
 
