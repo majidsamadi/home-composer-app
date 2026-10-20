@@ -40,3 +40,11 @@ Source: WBS §6 "Decisions to make later" (Q01–Q16). This file records the pro
 
 - IDM-01 (Account Centre registration of Composer) is OPEN. It blocks live sign-in and return together with Q15.
 - The vendored web-session pin sits on the unmerged upstream branch `feature/account-centre-safe-return-context`, and upstream `main` differs. Whether to re-pin is OPEN; the bytes are unchanged.
+
+## Wave 3 (2026-10-20)
+
+- **Q15-R1 (plan refinement, recorded by the integration loop).** The Composer site hosting (bucket, distribution, publisher role, publication parameter) lives in the owner-applied `wisestay-infrastructure` root `applications/three-d-dev`, not in `applications/websites`. The bucket name, the origin `https://composer.wizestay.com` and the session route shape are unchanged. No Cognito client is created for Composer.
+- **Pipeline status:** dev publication pipeline configured and locally verified (fakes, local build); dev deployment pending publish.
+- **Sign-in:** the page reaches the API only through the `user.wizestay.com` web-session BFF. Live mode stays off until the vendored web-session client registers `composer` (integration loop).
+- **Q14 expectation:** Resvanta property facts stay unavailable in dev, so placing objects into a home is expected to report BLOCKED (Q14).
+- **Test identities:** signed-in journeys need two owner-created synthetic accounts and the integration secrets described in the Home Scanner backend. Without them those journeys report BLOCKED.
