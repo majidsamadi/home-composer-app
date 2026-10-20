@@ -18,13 +18,13 @@ async function sha256(path) {
 test("vendored canonical WebSession bytes match the pinned producer identities", async () => {
   const mjs = fileURLToPath(new URL("../vendor/wisestay-web-session/web-session.mjs", import.meta.url));
   const dts = fileURLToPath(new URL("../vendor/wisestay-web-session/web-session.d.mts", import.meta.url));
-  assert.equal(await sha256(mjs), "8c83b03365b1a3eac5259d9c32ccc52c703fe6832c3dcbbe010ec05e02ca6b91");
-  assert.equal(await sha256(dts), "14a50fafea96514452d31066e6c47eecbe79cf9d9858905f87570280d6497dd9");
+  assert.equal(await sha256(mjs), "153b77584d8d10606ba183c64bb780770a0e256a85a6546343f6b08a2c975bac");
+  assert.equal(await sha256(dts), "9b70034885b0fc8c93699b26eb53a2cea68ecf622b313c0acd2e1c3e7027b9d3");
 });
 
-test("canonical allowlist remains unchanged and does not register Home Composer", () => {
+test("canonical allowlist registers composer at its exact origin only", () => {
   assert.equal(Object.hasOwn(APPLICATIONS, "home-composer"), false);
-  assert.equal(Object.hasOwn(APPLICATIONS, "composer"), false);
+  assert.equal(APPLICATIONS.composer, "https://composer.wizestay.com");
 });
 
 test("missing or disabled canonical session creates no fake account and performs no transport", async () => {

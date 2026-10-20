@@ -340,10 +340,12 @@ test("draft: B-RFX-07 'device loss while opening exact asset' exposes loss witho
 
 // ---------------------------------------------------------------- B-RFX-08
 
-test("draft: B-RFX-08 'four registrations unselected' — Composer is not registered", () => {
+test("draft: B-RFX-08 'four registrations unselected' — v0.3 example kept; wave 3 client registers composer", () => {
   const example = fixtureExample("B-RFX-08", "four registrations unselected");
   const composer = example.products.find(item => item.label === "Composer");
   assert.deepEqual(composer, { label: "Composer", application_identifier: null, origin: null, callback: null, environment: null });
-  assert.equal(Object.hasOwn(APPLICATIONS, "composer"), false);
+  // The v0.3 draft example records the pre-registration state and stays read-only.
+  // The wave 3 vendored client (IDM 5b08595) registers composer at its exact origin.
+  assert.equal(APPLICATIONS.composer, "https://composer.wizestay.com");
   assert.equal(Object.hasOwn(APPLICATIONS, "home-composer"), false);
 });

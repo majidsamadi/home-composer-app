@@ -1,9 +1,9 @@
 // Live-or-disconnected Composer service selection (wave 3 plan §6.3.1).
 // Live mode needs both: the vendored canonical client registers "composer", and a
 // WebSession built for it is enabled (the page runs at exactly that origin).
-// Otherwise the page keeps today's disconnected transport. With the vendored pin
-// 553ac3c, "composer" is not registered, so live mode is unreachable until the
-// integration loop re-vendors the client.
+// Otherwise the page keeps today's disconnected transport. The wave 3 pin
+// registers "composer", so live mode is reachable only at
+// https://composer.wizestay.com.
 import { APPLICATIONS, WebSession } from "../../vendor/wisestay-web-session/web-session.mjs";
 import { COMPOSER_APP } from "../service/composerApi.js";
 import {

@@ -54,11 +54,11 @@ function live(session, onUnauthorized) {
   });
 }
 
-test("the vendored pin does not register composer, so the default is disconnected", () => {
-  assert.equal(Object.hasOwn(APPLICATIONS, "composer"), false);
+test("the vendored pin registers composer; off its exact origin the default is disconnected", () => {
+  assert.equal(APPLICATIONS.composer, "https://composer.wizestay.com");
   const selection = selectComposerSession();
   assert.equal(selection.mode, LiveMode.DISCONNECTED);
-  assert.equal(selection.reason, "composer-not-registered");
+  assert.notEqual(selection.reason, "composer-not-registered");
   assert.equal(createComposerService().mode, LiveMode.DISCONNECTED);
 });
 
