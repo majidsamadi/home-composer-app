@@ -15,7 +15,9 @@ export const FIT_REASON_TEXT = Object.freeze({
   clearance_not_requested: "No clearance margin was requested.",
   footprint_outside_home_bounds: "The footprint extends past the home bounds.",
   margin_within_uncertainty: "Measurement uncertainty is not smaller than the margin.",
-  opening_clearance_not_supported: "Door swing and openings are not checked."
+  opening_clearance_not_supported: "Door swing and openings are not checked.",
+  home_source_not_found: "The home scan used by this design can't be found. It may have been withdrawn or deleted.",
+  home_source_unavailable: "The home scan is temporarily unavailable, so fit can't be checked right now."
 });
 
 export const OPENINGS_NOTE = "Door swing and openings are not checked.";
@@ -23,7 +25,8 @@ export const OPENINGS_NOTE = "Door swing and openings are not checked.";
 export function describeFit(fit) {
   if (!fit) return Object.freeze({ outcome: null, label: "No fit check yet", reasons: Object.freeze([]), detail: "", openingsNote: OPENINGS_NOTE });
   const label = FIT_LABELS[fit.outcome] ?? FIT_LABELS.unknown;
-  const reasons = (fit.reasons ?? []).map(code => FIT_REASON_TEXT[code] ?? code);
+  // The openings note is always shown once (openingsNote), so its reason code is not repeated in the list.
+  const reasons = (fit.reasons ?? []).filter(code => code !== "opening_clearance_not_supported").map(code => FIT_REASON_TEXT[code] ?? code);
   const parts = [];
   if (typeof fit.combined_uncertainty_m === "number") parts.push(`combined uncertainty ${fit.combined_uncertainty_m.toFixed(3)} m`);
   if (typeof fit.margin_m === "number") parts.push(`margin ${fit.margin_m.toFixed(3)} m`);

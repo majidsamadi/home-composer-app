@@ -30,8 +30,9 @@ function stableStringify(value) {
 
 // HCB-04 fit rules (X.4, Q03 provisional). Pure; exported for tests and presentation checks.
 export function computeFit({ placement, home, question = null, clearanceMarginM = null }) {
+  // As HCB: footprint answers always carry opening_clearance_not_supported (door swing is not checked).
   const result = (outcome, reasons, combined = null, margin = null) => ({
-    outcome, reasons, thresholds_version: THRESHOLDS_VERSION, combined_uncertainty_m: combined, margin_m: margin
+    outcome, reasons: question === "footprint" ? [...reasons, "opening_clearance_not_supported"] : reasons, thresholds_version: THRESHOLDS_VERSION, combined_uncertainty_m: combined, margin_m: margin
   });
   if (placement.scale_mode === "illustrative") return result("unknown", ["illustrative_scale_mode"]);
   if (placement.scale_claim === "unknown" || home.scale_claim === "unknown") return result("unknown", ["scale_claim_unknown"]);

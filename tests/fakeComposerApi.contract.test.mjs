@@ -6,6 +6,7 @@ import { loadFixture } from "../scripts/check-contract-fixtures-v0_4.mjs";
 import { COMPOSER_ROUTES, PROBLEM_TITLES, ServiceProblem, THRESHOLDS_VERSION } from "../src/service/composerApi.js";
 import { createComposerHttpApi, createDisconnectedTransport } from "../src/service/composerHttpApi.js";
 import { computeFit, createFakeComposerApi } from "../src/service/fakeComposerApi.js";
+import { FIT_REASON_TEXT, OPENINGS_NOTE, describeFit } from "../src/presentation/fitPresentation.js";
 import { SYNTHETIC, syntheticWorkspaceSeed } from "../src/fixtures/workspaceFixtures.js";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -118,7 +119,13 @@ test("HCA X.4 fit rules: verified, unverified, approximate and unknown outcomes"
   // Footprint margin: rotated 1 m box at x=1, z=1 inside a 4 m room → 0.5 m.
   assert.equal(computeFit({ placement: p1, home, question: "footprint" }).margin_m, 0.5);
   const outside = { ...p1, transform: { position_m: [1.8, 0, 1], rotation_deg_y: 0 } };
-  assert.deepEqual(computeFit({ placement: outside, home, question: "footprint" }).reasons, ["footprint_outside_home_bounds"]);
+  assert.deepEqual(computeFit({ placement: outside, home, question: "footprint" }).reasons, ["footprint_outside_home_bounds", "opening_clearance_not_supported"]);
+  // The openings note appears once: as openingsNote, never repeated in the reasons list.
+  const footprintText = describeFit(computeFit({ placement: outside, home, question: "footprint" }));
+  assert.deepEqual(footprintText.reasons, [FIT_REASON_TEXT.footprint_outside_home_bounds]);
+  assert.equal([...footprintText.reasons, footprintText.openingsNote].filter(text => text === OPENINGS_NOTE).length, 1);
+  assert.match(describeFit({ outcome: "unknown", reasons: ["home_source_not_found"], thresholds_version: THRESHOLDS_VERSION }).reasons[0], /can't be found/);
+  assert.match(describeFit({ outcome: "unknown", reasons: ["home_source_unavailable"], thresholds_version: THRESHOLDS_VERSION }).reasons[0], /temporarily unavailable/);
   const approximate = computeFit({ placement: p2, home, question: "clearance", clearanceMarginM: 0.3 });
   assert.equal(approximate.outcome, "approximate");
   assert.deepEqual(approximate.reasons, ["scale_claim_approximate"]);
