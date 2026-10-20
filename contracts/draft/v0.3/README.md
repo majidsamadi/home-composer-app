@@ -9,3 +9,5 @@ B-RFX-01..08 v0.3 draft fixtures, Home Composer **consumer copy**. The reference
 - `status: PREPARED_NOT_EXECUTED_NOT_ACCEPTED` in each fixture is authoritative. No field here is a deployed API schema. Freezing needs owner answers to Q01, Q03, Q04, Q05 and Q06 (see `docs/DECISIONS_PENDING.md`).
 
 Sync check: `node scripts/check-contract-fixtures.mjs` (or `npm run check:contracts`). Use `--compare <repo-root> ...` to compare sibling copies. The check is unit-tested in `tests/contractFixtures.sync.test.mjs`, and the fixtures are consumed by `tests/contractFixtures.v0_3.test.mjs`.
+
+A stray `.DS_Store` (or any other unlisted file) under a checksum-closed subtree fails the checker by design; `.gitignore` ignores `.DS_Store` so it is never committed.
