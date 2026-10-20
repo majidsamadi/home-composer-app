@@ -1,0 +1,46 @@
+{
+  "record_id": "E-P06-CANONICAL-CURRENTNESS-CONSUME-02-SOURCE",
+  "producer": {
+    "repository": "majidsamadi/wisestay-user-management-backend",
+    "branch": "feature/account-centre-safe-return-context",
+    "commit": "553ac3c08973114f26271d1a751437d9203b5cd4",
+    "tree": "c032cf7ed87eb5168272e2e9a5eab612803da146"
+  },
+  "vendored": [
+    {
+      "source_path": "clients/web-session/web-session.mjs",
+      "target_path": "vendor/wisestay-web-session/web-session.mjs",
+      "producer_git_blob": "625a036934bc3c9b2ad788c9811e1ec8be42b76f",
+      "target_git_blob": "625a036934bc3c9b2ad788c9811e1ec8be42b76f",
+      "bytes": 17155,
+      "sha256": "8c83b03365b1a3eac5259d9c32ccc52c703fe6832c3dcbbe010ec05e02ca6b91",
+      "edited": false
+    },
+    {
+      "source_path": "clients/web-session/web-session.d.mts",
+      "target_path": "vendor/wisestay-web-session/web-session.d.mts",
+      "producer_git_blob": "02e5b0967d436cb73737c29030702bc5c790c187",
+      "target_git_blob": "02e5b0967d436cb73737c29030702bc5c790c187",
+      "bytes": 1736,
+      "sha256": "14a50fafea96514452d31066e6c47eecbe79cf9d9858905f87570280d6497dd9",
+      "edited": false
+    }
+  ],
+  "consumed_feature": {
+    "api": "WebSession.isCurrent(receipt)",
+    "meaning": "Process-local exact receipt object remains current, authenticated, non-expired and non-blocked.",
+    "nonclaims": [
+      "Not a resource/action grant.",
+      "Not an authority/source revision.",
+      "Not an organization/property/shop/role claim.",
+      "Does not register Home Composer or select an origin."
+    ]
+  },
+  "limits": [
+    "Byte-for-byte vendored canonical client; not modified by Home Composer.",
+    "Home Composer remains absent from the canonical application allowlist.",
+    "Default Composer runtime remains disconnected until an approved caller explicitly injects a canonical session.",
+    "Existing tenant application is used only as isolated synthetic protocol fixture.",
+    "Resource/design availability remains independently supplied by its owning adapter."
+  ]
+}
