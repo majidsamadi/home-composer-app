@@ -9,6 +9,8 @@ import { sceneSelectionReason } from "./domain/homeSceneSelectionState.js";
 import { describeEntryIntent } from "./domain/entryIntent.js";
 import { mountEntryInitialization } from "./presentation/entryInitView.js";
 import { mountSyntheticWorkspace } from "./presentation/workspaceMount.js";
+import { mountSessionPanel } from "./presentation/sessionPanel.js";
+import { createComposerService } from "./application/liveComposition.js";
 import { createLocalDesignLibraryAdapter } from "./fixtures/designLibraryFixtures.js";
 import { createLocalHomeSceneAdapter } from "./fixtures/homeSceneFixtures.js";
 import {
@@ -21,6 +23,11 @@ import {
 
 // Deliberately disconnected by default: no canonical session and no library adapter.
 const { controller, identityBridge, libraryController, sceneController } = createComposerApplication();
+// Live Composer service only when the vendored canonical client registers "composer"
+// and this page runs at its exact origin; otherwise the disconnected transport.
+let sessionPanel;
+const composerService = createComposerService({ onUnauthorized: code => sessionPanel?.markSignedOut(code) });
+sessionPanel = mountSessionPanel(document, { service: composerService });
 const fixtureButtons = [...document.querySelectorAll("[data-fixture]")];
 const libraryFixtureButtons = [...document.querySelectorAll("[data-library-fixture]")];
 const sceneFixtureButtons = [...document.querySelectorAll("[data-scene-fixture]")];
@@ -315,7 +322,12 @@ document.getElementById("local-save-ack").addEventListener("click", () => {
 });
 
 window.__WISESTAY_REVIEW_FIXTURE__ = Object.freeze({ provenance });
-identityBridge.disconnect("canonical-session-not-configured");
+if (composerService.mode === "live") {
+  identityBridge.setSession(composerService.session);
+  void sessionPanel.refresh();
+} else {
+  identityBridge.disconnect("canonical-session-not-configured");
+}
 libraryController.invalidateContext("library-adapter-not-connected");
 sceneController.invalidateContext("scene-adapter-not-connected");
 render();
